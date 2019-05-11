@@ -19,5 +19,4 @@ class NewsApiProvider {
 
     return ItemModel.fromJson(parsedJson);
   }
-  
 }
