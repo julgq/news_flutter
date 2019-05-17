@@ -14,55 +14,64 @@ class NewsDbProvider implements Source, Cache {
   }
 
   // Todo - store and fetch top ids
-  @override
   Future<List<int>> fetchTopIds() {
-    // TODO: implement fetchTopIds
     return null;
   }
 
-  void int() async {
+  void init() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, 'items.db');
+    final path = join(documentsDirectory.path, "items4.db");
     db = await openDatabase(
       path,
       version: 1,
       onCreate: (Database newDb, int version) {
         newDb.execute("""
-        CREATE TABLE Items 
-        (
-          id INTEGER PRIMARY KEY,
-          type TEXT,
-          by TEXT,
-          time INTEGER,
-          text TEXT,
-          parent INTEGER,
-          kids BLOB,
-          dead INTEGER,
-          deleted INTEGER,
-          url TEXT,
-          descendants INTEGER
-        )
+          CREATE TABLE Items
+            (
+              id INTEGER PRIMARY KEY,
+              type TEXT,
+              by TEXT,
+              time INTEGER,
+              text TEXT,
+              parent INTEGER,
+              kids BLOB,
+              dead INTEGER,
+              deleted INTEGER,
+              url TEXT,
+              score INTEGER,
+              title TEXT,
+              descendants INTEGER
+            )
         """);
       },
     );
   }
 
-  // regresa un item guardado ya en la base de datos.
-  fetchItem(int id) async {
-    final maps = await db.query("Items",
-        columns: null, // Todas las columnas,
-        where: "id = ?",
-        whereArgs: [id]);
+  Future<ItemModel> fetchItem(int id) async {
+    final maps = await db.query(
+      "Items",
+      columns: null,
+      where: "id = ?",
+      whereArgs: [id],
+    );
 
     if (maps.length > 0) {
       return ItemModel.fromDb(maps.first);
-    } else {
-      return null;
     }
+
+    return null;
   }
 
   Future<int> addItem(ItemModel item) {
-    return db.insert("Items", item.toMap());
+    return db.insert(
+      "Items",
+      item.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  Future<int> clear() {
+    return db.delete("Items");
   }
 }
 
