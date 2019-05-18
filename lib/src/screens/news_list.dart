@@ -12,6 +12,7 @@ class NewsList extends StatelessWidget {
       body: buildList(),
     );
   }
+  
 
   Widget buildList() {
     return ListView.builder(
